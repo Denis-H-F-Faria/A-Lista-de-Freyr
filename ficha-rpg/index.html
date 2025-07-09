@@ -1,13 +1,266 @@
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Vite + React</title>
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.jsx"></script>
-  </body>
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <title>Ficha Interativa – Sistema D6 Relíquias</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <!-- Google Font semelhante ao usado na arte -->
+  <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;600&display=swap" rel="stylesheet" />
+  <style>
+    :root{
+      --bg:#0f1012;
+      --panel:#1b1d21;
+      --text:#e5e7eb;
+      --accent:#29a1f7;
+      --hp:#d84e60;
+      --def:#5865f2;
+    }
+
+    *{box-sizing:border-box;font-family:'Rajdhani',sans-serif;color:var(--text);}
+    body{margin:0;background:var(--bg);}
+
+    /* ---------- TABS ---------- */
+    .tabs{display:flex;gap:4px;justify-content:center;padding:20px;}
+    .tab{
+      background:var(--panel);
+      border:none;
+      padding:10px 40px;
+      font-size:1.5rem;
+      clip-path:polygon(10% 0,100% 0,90% 100%,0 100%);
+      cursor:pointer;
+      opacity:.6;
+      transition:.2s;
+    }
+    .tab.active{opacity:1;}
+    .tab-content{display:none;padding:0 20px 40px;}
+    .tab-content.active{display:block;}
+
+    /* ---------- GRID ---------- */
+    .sheet{display:grid;grid-template-columns:260px 1fr 300px;gap:20px;}
+
+    /* ---------- LEFT PANEL ---------- */
+    .left-panel{
+      background:var(--panel);
+      padding:20px;
+      border-radius:8px;
+      display:flex;
+      flex-direction:column;
+      gap:20px;
+    }
+    .left-panel h3{margin:0;margin-bottom:10px;font-size:1.4rem;color:var(--accent);}
+    .left-panel label,input{width:100%;}
+    .attributes ul,.skills ul{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:6px;}
+    .attributes li,.skills li{display:flex;justify-content:space-between;align-items:center;}
+    .attributes input,.skills input{
+      width:60px;
+      background:#000;
+      border:1px solid #333;
+      padding:2px 4px;
+      font-size:1rem;
+      text-align:center;
+      color:var(--accent);
+    }
+
+    /* ---------- MIDDLE PANEL ---------- */
+    .middle-panel{display:flex;flex-direction:column;gap:20px;}
+    .portrait{
+      background:var(--panel);
+      flex:1;
+      min-height:260px;
+      border-radius:8px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-size:1rem;
+      border:2px dashed #333;
+      text-align:center;
+    }
+    .stats{
+      background:var(--panel);
+      border-radius:8px;
+      padding:20px;
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+    }
+    .stats label{display:flex;justify-content:space-between;align-items:center;font-size:1.2rem;}
+    progress{width:100%;height:16px;border-radius:8px;appearance:none}
+    progress::-webkit-progress-bar{background:#222;border-radius:8px;}
+    progress#pv-bar::-webkit-progress-value{background:var(--hp);border-radius:8px;}
+    progress#def-bar::-webkit-progress-value{background:var(--def);border-radius:8px;}
+    progress#xp-bar::-webkit-progress-value{background:var(--accent);border-radius:8px;}
+
+    /* ---------- RIGHT PANEL ---------- */
+    .right-panel{
+      background:var(--panel);
+      padding:20px;
+      border-radius:8px;
+      display:flex;
+      flex-direction:column;
+      gap:14px;
+    }
+    .right-panel .equip{display:flex;justify-content:space-between;gap:10px;}
+    .right-panel input{flex:1;background:#000;border:1px solid #333;padding:6px;}
+    .artifact{flex:1;background:#0003;border:1px solid #333;border-radius:6px;min-height:120px;padding:10px;}
+
+    @media(max-width:950px){
+      .sheet{grid-template-columns:1fr;}
+      .right-panel,.left-panel,.middle-panel{order:initial;}
+    }
+  </style>
+</head>
+<body>
+  <div class="tabs">
+    <button class="tab active" data-tab="ficha">Ficha</button>
+    <button class="tab" data-tab="mochila">Mochila</button>
+    <button class="tab" data-tab="habilidades">Habilidades</button>
+  </div>
+
+  <!-- =================== ABA FICHA =================== -->
+  <section id="ficha" class="tab-content active">
+    <div class="sheet">
+
+      <!-- LEFT PANEL -->
+      <div class="left-panel">
+        <label>Nome:<input type="text" id="nome" /></label>
+
+        <div class="attributes">
+          <h3>Atributos</h3>
+          <ul>
+            <li>Força <input type="number" id="for" min="0" max="10" /></li>
+            <li>Vontade <input type="number" id="von" min="0" max="10" /></li>
+            <li>Agilidade <input type="number" id="agi" min="0" max="10" /></li>
+            <li>Intelecto <input type="number" id="int" min="0" max="10" /></li>
+            <li>Presença <input type="number" id="pre" min="0" max="10" /></li>
+            <li>Sorte <input type="number" id="sor" min="0" max="10" /></li>
+          </ul>
+        </div>
+
+        <div class="skills">
+          <h3>Perícias</h3>
+          <ul>
+            <li>Luta <input type="number" min="0" max="5" /></li>
+            <li>Mentira <input type="number" min="0" max="5" /></li>
+            <li>Intuição <input type="number" min="0" max="5" /></li>
+            <li>Pontaria <input type="number" min="0" max="5" /></li>
+            <li>Medicina <input type="number" min="0" max="5" /></li>
+            <li>Atletismo <input type="number" min="0" max="5" /></li>
+            <li>Pilotagem <input type="number" min="0" max="5" /></li>
+            <li>Percepção <input type="number" min="0" max="5" /></li>
+            <li>Furtividade <input type="number" min="0" max="5" /></li>
+            <li>Intimidação <input type="number" min="0" max="5" /></li>
+            <li>Investigação <input type="number" min="0" max="5" /></li>
+            <li>Conhecimento <input type="number" min="0" max="5" /></li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- MIDDLE PANEL -->
+      <div class="middle-panel">
+        <div class="portrait" id="portrait">Arraste uma imagem<br />ou clique para carregar</div>
+        <div class="stats">
+          <label>Pontos de Vida <span><input type="number" id="pv" value="0" /> / <input type="number" id="pv-max" value="20" /></span></label>
+          <progress id="pv-bar" value="0" max="20"></progress>
+
+          <label>Defesa <span><input type="number" id="def" value="0" /> / <input type="number" id="def-max" value="12" /></span></label>
+          <progress id="def-bar" value="0" max="12"></progress>
+
+          <label>Nível <input type="number" id="nivel" value="1" min="1" /></label>
+          <label>Experiência <span><input type="number" id="xp" value="0" /> / <input type="number" id="xp-max" value="100" /></span></label>
+          <progress id="xp-bar" value="0" max="100"></progress>
+        </div>
+      </div>
+
+      <!-- RIGHT PANEL -->
+      <div class="right-panel">
+        <div class="equip">
+          <label>Arma Principal <input type="text" id="arma1" /></label>
+          <label>Escudo <input type="text" id="escudo" /></label>
+        </div>
+        <div class="equip">
+          <label>Arma Secundária <input type="text" id="arma2" /></label>
+          <label>Equipamento <input type="text" id="equip" /></label>
+        </div>
+        <label>Artefato</label>
+        <div class="artifact" id="artefato" contenteditable="true"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- =================== ABA MOCHILA =================== -->
+  <section id="mochila" class="tab-content">
+    <h2 style="color:var(--accent)">Inventário</h2>
+    <textarea style="width:100%;height:300px;background:var(--panel);color:var(--text);border:none;padding:20px;border-radius:8px"></textarea>
+  </section>
+
+  <!-- =================== ABA HABILIDADES =================== -->
+  <section id="habilidades" class="tab-content">
+    <h2 style="color:var(--accent)">Habilidades &amp; Poderes</h2>
+    <textarea style="width:100%;height:300px;background:var(--panel);color:var(--text);border:none;padding:20px;border-radius:8px"></textarea>
+  </section>
+
+  <script>
+    /* ---------- Troca de abas ---------- */
+    document.querySelectorAll('.tab').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        document.querySelector('.tab.active').classList.remove('active');
+        btn.classList.add('active');
+        document.querySelector('.tab-content.active').classList.remove('active');
+        document.getElementById(btn.dataset.tab).classList.add('active');
+      });
+    });
+
+    /* ---------- Sincroniza barras com inputs ---------- */
+    function bindBar(inputId, maxId, barId) {
+      const input = document.getElementById(inputId);
+      const max = document.getElementById(maxId);
+      const bar = document.getElementById(barId);
+      function update() {
+        bar.value = input.value;
+        bar.max = max.value;
+      }
+      input.addEventListener('input', update);
+      max.addEventListener('input', update);
+      update(); // inicial
+    }
+    bindBar('pv', 'pv-max', 'pv-bar');
+    bindBar('def', 'def-max', 'def-bar');
+    bindBar('xp', 'xp-max', 'xp-bar');
+
+    /* ---------- Upload de retrato ---------- */
+    const portrait = document.getElementById('portrait');
+    portrait.addEventListener('click', () => {
+      const fileInput = document.createElement('input');
+      fileInput.type = 'file';
+      fileInput.accept = 'image/*';
+      fileInput.onchange = (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        const url = URL.createObjectURL(file);
+        portrait.innerHTML = `<img src="${url}" alt="Retrato" style="max-width:100%;max-height:100%;object-fit:cover;border-radius:6px;" />`;
+      };
+      fileInput.click();
+    });
+
+    /* ---------- Persistência local (localStorage) ---------- */
+    const FIELDS = ['nome', 'for', 'von', 'agi', 'int', 'pre', 'sor', 'pv', 'pv-max', 'def', 'def-max', 'nivel', 'xp', 'xp-max', 'arma1', 'escudo', 'arma2', 'equip'];
+    // Salvar
+    window.addEventListener('beforeunload', () => {
+      FIELDS.forEach((id) => {
+        localStorage.setItem(`d6_${id}`, document.getElementById(id).value);
+      });
+      localStorage.setItem('d6_artefato', document.getElementById('artefato').innerHTML);
+    });
+    // Carregar
+    window.addEventListener('load', () => {
+      FIELDS.forEach((id) => {
+        const el = document.getElementById(id);
+        const saved = localStorage.getItem(`d6_${id}`);
+        if (saved !== null) el.value = saved;
+      });
+      const art = localStorage.getItem('d6_artefato');
+      if (art) document.getElementById('artefato').innerHTML = art;
+    });
+  </script>
+</body>
 </html>
