@@ -20,6 +20,31 @@ export default function Dashboard() {
     navigate('/');
   };
 
+  const criarCampanha = async () => {
+    const nome = prompt('Digite o nome da campanha:');
+    if (!nome) return;
+
+    const token = localStorage.getItem('token');
+
+    const res = await fetch('http://localhost:3001/campanhas', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': token,
+      },
+      body: JSON.stringify({ nome }),
+    });
+
+    if (res.ok) {
+      const novaCampanha = await res.json();
+      alert(`Campanha criada! Código: ${novaCampanha.codigo}`);
+      // Aqui você pode atualizar a lista de campanhas, se quiser
+    } else {
+      const msg = await res.text();
+      alert('Erro ao criar campanha: ' + msg);
+    }
+  };
+
   if (!usuario) return null;
 
   return (
@@ -36,7 +61,9 @@ export default function Dashboard() {
           <h5>Suas Campanhas como Mestre</h5>
           <div className="alert alert-info d-flex justify-content-between align-items-center">
             Nenhuma campanha criada ainda.
-            <button className="btn btn-sm btn-primary">Criar Campanha</button>
+            <button className="btn btn-sm btn-primary" onClick={criarCampanha}>
+              Criar Campanha
+            </button>
           </div>
         </div>
 

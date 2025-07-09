@@ -4,21 +4,27 @@ import { useNavigate } from 'react-router-dom';
 export default function Login() {
   const [email, setEmail] = useState('');
   const [senha, setSenha] = useState('');
+  const [mostrarSenha, setMostrarSenha] = useState(false);
   const navigate = useNavigate();
 
   const handleLogin = async () => {
-    const res = await fetch('http://localhost:3001/login', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, senha }),
-    });
+    try {
+      const res = await fetch('http://localhost:3001/usuario/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, senha }),
+      });
 
-    if (!res.ok) return alert('Falha no login');
+      if (!res.ok) return alert('Falha no login');
 
-    const data = await res.json();
-    localStorage.setItem('token', data.token);
-    localStorage.setItem('usuario', JSON.stringify(data.usuario));
-    navigate('/dashboard');
+      const data = await res.json();
+      localStorage.setItem('token', data.token);
+      localStorage.setItem('usuario', JSON.stringify(data.usuario));
+      navigate('/dashboard');
+    } catch (err) {
+      console.error('Erro no login:', err);
+      alert('Erro inesperado. Tente novamente.');
+    }
   };
 
   return (
@@ -38,12 +44,21 @@ export default function Login() {
 
       <div className="mb-3">
         <label>Senha</label>
-        <input
-          type="password"
-          className="form-control"
-          value={senha}
-          onChange={(e) => setSenha(e.target.value)}
-        />
+        <div className="input-group">
+          <input
+            type={mostrarSenha ? 'text' : 'password'}
+            className="form-control"
+            value={senha}
+            onChange={(e) => setSenha(e.target.value)}
+          />
+          <button
+            type="button"
+            className="btn btn-outline-secondary"
+            onClick={() => setMostrarSenha(!mostrarSenha)}
+          >
+            <i className={`bi ${mostrarSenha ? 'bi-eye-slash' : 'bi-eye'}`}></i>
+          </button>
+        </div>
       </div>
 
       <button className="btn btn-primary w-100" onClick={handleLogin}>

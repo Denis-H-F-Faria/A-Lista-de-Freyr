@@ -8,25 +8,30 @@ export default function Register() {
   const navigate = useNavigate();
 
   const handleRegister = async () => {
-    const res = await fetch('http://localhost:3001/register', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ nome, email, senha }),
-    });
+    try {
+      const res = await fetch('http://localhost:3001/usuario/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ nome, email, senha }),
+      });
 
-    if (res.ok) {
-      alert('Cadastro realizado com sucesso');
+      if (!res.ok) {
+        const msg = await res.text();
+        return alert(`Erro: ${msg}`);
+      }
+
+      alert('Cadastro realizado com sucesso!');
       navigate('/');
-    } else {
-      const msg = await res.text();
-      alert('Erro ao cadastrar: ' + msg);
+    } catch (err) {
+      console.error('Erro no cadastro:', err);
+      alert('Erro inesperado. Tente novamente.');
     }
   };
 
   return (
     <div className="d-flex justify-content-center align-items-center min-vh-100">
-      <div className="card">
-        <h2>Cadastro</h2>
+      <div className="card p-4" style={{ maxWidth: '400px', width: '100%' }}>
+        <h2 className="mb-4">Cadastro</h2>
 
         <div className="mb-3">
           <label>Nome</label>
