@@ -1,7 +1,9 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import useAuthRedirect from '../hooks/useAuthRedirect';
 
 export default function Register() {
+  useAuthRedirect(); // 🔒 Redireciona se estiver logado
   const [nome, setNome] = useState('');
   const [email, setEmail] = useState('');
   const [senha, setSenha] = useState('');
@@ -32,7 +34,7 @@ export default function Register() {
   return (
     <div className="d-flex justify-content-center align-items-center min-vh-100">
       <div className="card p-4" style={{ maxWidth: '400px', width: '100%' }}>
-        <h2 className="mb-4">Cadastro</h2>
+        <h2 className="mb-4 text-center">Cadastro</h2>
 
         <div className="mb-3">
           <label>Nome</label>
@@ -67,6 +69,7 @@ export default function Register() {
               type="button"
               className="btn btn-outline-secondary"
               onClick={() => setMostrarSenha(!mostrarSenha)}
+              tabIndex={-1}
             >
               <i className={`bi ${mostrarSenha ? 'bi-eye-slash' : 'bi-eye'}`}></i>
             </button>

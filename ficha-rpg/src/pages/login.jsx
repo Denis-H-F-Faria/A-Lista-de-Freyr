@@ -1,7 +1,9 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import useAuthRedirect from '../hooks/useAuthRedirect';
 
 export default function Login() {
+  useAuthRedirect(); // 🔒 Redireciona se estiver logado
   const [email, setEmail] = useState('');
   const [senha, setSenha] = useState('');
   const [mostrarSenha, setMostrarSenha] = useState(false);
@@ -28,47 +30,48 @@ export default function Login() {
   };
 
   return (
-  <div className="d-flex justify-content-center align-items-center min-vh-100">
-    <div className="card">
-      <h2>Login</h2>
+    <div className="d-flex justify-content-center align-items-center min-vh-100">
+      <div className="card p-4" style={{ minWidth: '300px' }}>
+        <h2 className="mb-4 text-center">Login</h2>
 
-      <div className="mb-3">
-        <label>Email</label>
-        <input
-          type="email"
-          className="form-control"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-        />
-      </div>
-
-      <div className="mb-3">
-        <label>Senha</label>
-        <div className="input-group">
+        <div className="mb-3">
+          <label>Email</label>
           <input
-            type={mostrarSenha ? 'text' : 'password'}
+            type="email"
             className="form-control"
-            value={senha}
-            onChange={(e) => setSenha(e.target.value)}
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
           />
-          <button
-            type="button"
-            className="btn btn-outline-secondary"
-            onClick={() => setMostrarSenha(!mostrarSenha)}
-          >
-            <i className={`bi ${mostrarSenha ? 'bi-eye-slash' : 'bi-eye'}`}></i>
-          </button>
         </div>
+
+        <div className="mb-3">
+          <label>Senha</label>
+          <div className="input-group">
+            <input
+              type={mostrarSenha ? 'text' : 'password'}
+              className="form-control"
+              value={senha}
+              onChange={(e) => setSenha(e.target.value)}
+            />
+            <button
+              type="button"
+              className="btn btn-outline-secondary"
+              onClick={() => setMostrarSenha(!mostrarSenha)}
+              tabIndex={-1}
+            >
+              <i className={`bi ${mostrarSenha ? 'bi-eye-slash' : 'bi-eye'}`}></i>
+            </button>
+          </div>
+        </div>
+
+        <button className="btn btn-primary w-100" onClick={handleLogin}>
+          Entrar
+        </button>
+
+        <p className="mt-3 text-center">
+          Não tem conta? <a href="/register">Cadastrar</a>
+        </p>
       </div>
-
-      <button className="btn btn-primary w-100" onClick={handleLogin}>
-        Entrar
-      </button>
-
-      <p className="mt-3 text-center">
-        Não tem conta? <a href="/register">Cadastrar</a>
-      </p>
     </div>
-  </div>
-);
+  );
 }
