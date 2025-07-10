@@ -156,13 +156,14 @@ export default function Dashboard() {
   const renderCampanhaBox = (campanha) => (
     <div
       key={campanha._id || campanha.id}
-      className="card mb-2 p-3 d-flex justify-content-between align-items-center"
+      className="card row mb-2 p-3 d-flex align-items-start justify-content-between"
       style={{
         borderLeft: `5px solid ${coresSistema[campanha.sistema] || '#6c757d'}`,
         cursor: 'default',
-        gap: '10px',
+        gap: '0px',
       }}
     >
+      {/* Lado esquerdo: logo + info */}
       <div className="d-flex align-items-center gap-3" style={{ flex: 1 }}>
         <img
           src={logosSistema[campanha.sistema] || '/logos/default.png'}
@@ -174,8 +175,13 @@ export default function Dashboard() {
           <small className="text-muted">{campanha.sistema}</small><br />
           <small>Código: {campanha.codigo}</small>
         </div>
+        <h6 className="d-flex gap-1 ms-auto">Jogadores 0/8</h6>
+        {/* Editar isso e conectar com o banco */}
       </div>
-      <div className="d-flex flex-column gap-2">
+
+      {/* Lado direito: botões em coluna */}
+      <div className="d-flex align-items-center gap-1 ms-auto">
+        
         <button
           className="btn btn-sm btn-primary"
           onClick={() => handleAcessar(campanha)}
@@ -218,7 +224,7 @@ export default function Dashboard() {
     <Layout usuario={usuario}>
       <div className="container py-4">
         <div className="row">
-          <div className="col-md-6">
+          <div className="col-md-5">
             <h5>Suas Campanhas como Mestre</h5>
             {campanhasMestre.length === 0 && (
               <div className="alert alert-info d-flex justify-content-between align-items-center">
@@ -231,7 +237,7 @@ export default function Dashboard() {
             {campanhasMestre.map(renderCampanhaBox)}
           </div>
 
-          <div className="col-md-6">
+          <div className="col-md-5">
             <h5>Campanhas que você participa</h5>
             {campanhasJogador.length === 0 && (
               <div className="alert alert-secondary d-flex justify-content-between align-items-center">
