@@ -1,14 +1,22 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import useAuthRedirect from '../hooks/useAuthRedirect';
+import Header from '../components/header'; // ajuste o caminho conforme seu projeto
 
 export default function Register() {
-  useAuthRedirect(); // 🔒 Redireciona se estiver logado
+  useAuthRedirect(); // 🔒 redireciona se estiver logado
+
   const [nome, setNome] = useState('');
   const [email, setEmail] = useState('');
   const [senha, setSenha] = useState('');
   const [mostrarSenha, setMostrarSenha] = useState(false);
+  const [usuario, setUsuario] = useState(null);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const dadosUsuario = localStorage.getItem('usuario');
+    setUsuario(dadosUsuario ? JSON.parse(dadosUsuario) : null);
+  }, []);
 
   const handleRegister = async () => {
     try {
@@ -32,58 +40,61 @@ export default function Register() {
   };
 
   return (
-    <div className="d-flex justify-content-center align-items-center min-vh-100">
-      <div className="card p-4" style={{ maxWidth: '400px', width: '100%' }}>
-        <h2 className="mb-4 text-center">Cadastro</h2>
+    <>
+      <Header usuario={usuario} />
+      <div className="d-flex justify-content-center align-items-center min-vh-100">
+        <div className="card p-4" style={{ maxWidth: '400px', width: '100%' }}>
+          <h2 className="mb-4 text-center">Cadastro</h2>
 
-        <div className="mb-3">
-          <label>Nome</label>
-          <input
-            type="text"
-            className="form-control"
-            value={nome}
-            onChange={(e) => setNome(e.target.value)}
-          />
-        </div>
-
-        <div className="mb-3">
-          <label>Email</label>
-          <input
-            type="email"
-            className="form-control"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-          />
-        </div>
-
-        <div className="mb-3">
-          <label>Senha</label>
-          <div className="input-group">
+          <div className="mb-3">
+            <label>Nome</label>
             <input
-              type={mostrarSenha ? 'text' : 'password'}
+              type="text"
               className="form-control"
-              value={senha}
-              onChange={(e) => setSenha(e.target.value)}
+              value={nome}
+              onChange={(e) => setNome(e.target.value)}
             />
-            <button
-              type="button"
-              className="btn btn-outline-secondary"
-              onClick={() => setMostrarSenha(!mostrarSenha)}
-              tabIndex={-1}
-            >
-              <i className={`bi ${mostrarSenha ? 'bi-eye-slash' : 'bi-eye'}`}></i>
-            </button>
           </div>
+
+          <div className="mb-3">
+            <label>Email</label>
+            <input
+              type="email"
+              className="form-control"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
+          </div>
+
+          <div className="mb-3">
+            <label>Senha</label>
+            <div className="input-group">
+              <input
+                type={mostrarSenha ? 'text' : 'password'}
+                className="form-control"
+                value={senha}
+                onChange={(e) => setSenha(e.target.value)}
+              />
+              <button
+                type="button"
+                className="btn btn-outline-secondary"
+                onClick={() => setMostrarSenha(!mostrarSenha)}
+                tabIndex={-1}
+              >
+                <i className={`bi ${mostrarSenha ? 'bi-eye-slash' : 'bi-eye'}`}></i>
+              </button>
+            </div>
+          </div>
+
+          <button className="btn btn-primary w-100" onClick={handleRegister}>
+            Cadastrar
+          </button>
+
+          <p className="mt-3 text-center">
+            Já tem conta? <a href="/">Entrar</a>
+          </p>
         </div>
-
-        <button className="btn btn-primary w-100" onClick={handleRegister}>
-          Cadastrar
-        </button>
-
-        <p className="mt-3 text-center">
-          Já tem conta? <a href="/">Entrar</a>
-        </p>
       </div>
-    </div>
+    </>
   );
 }

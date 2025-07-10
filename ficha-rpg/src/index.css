@@ -19,6 +19,10 @@ html, body, #root {
   color: var(--text-color);
 }
 
+body > main {
+  padding-top: 70px; /* ajuste conforme a altura do seu header fixo */
+}
+
 a {
   color: #0d6efd;
   text-decoration: none;

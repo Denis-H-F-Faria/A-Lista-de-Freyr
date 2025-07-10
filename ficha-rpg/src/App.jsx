@@ -3,6 +3,7 @@ import Login from './pages/login';
 import Register from './pages/register';
 import Dashboard from './pages/dashboard';
 import Ficha from './pages/ficha';
+import Configuracoes from './pages/configuracoes';
 import PrivateRoute from './components/PrivateRoute';
 
 function App() {
@@ -19,6 +20,9 @@ function App() {
         } />
         <Route path="/ficha" element={
           <PrivateRoute><Ficha /></PrivateRoute>
+        } />
+        <Route path="/configuracoes" element={
+          <PrivateRoute><Configuracoes /></PrivateRoute>
         } />
       </Routes>
     </BrowserRouter>

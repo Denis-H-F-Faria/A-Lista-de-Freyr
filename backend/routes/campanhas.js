@@ -1,7 +1,8 @@
-const express = require('express');
+import express from 'express';
+import jwt from 'jsonwebtoken';
+import Campanha from '../models/campanha.js';
+
 const router = express.Router();
-const Campanha = require('../models/campanha');
-const jwt = require('jsonwebtoken');
 
 // Middleware para verificar token
 function autenticar(req, res, next) {
@@ -42,4 +43,4 @@ router.post('/', autenticar, async (req, res) => {
   }
 });
 
-module.exports = router;
+export default router;

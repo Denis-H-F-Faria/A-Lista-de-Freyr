@@ -1,5 +1,5 @@
-export function logout() {
+export function logout(navigate) {
   localStorage.removeItem('token');
   localStorage.removeItem('usuario');
-  window.location.href = '/'; // Redireciona para o login
+  navigate('/');
 }

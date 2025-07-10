@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
-import { logout } from '../utils/auth';
+import Layout from '../components/layout';
 
 export default function Dashboard() {
   const [usuario, setUsuario] = useState(null);
@@ -48,35 +48,30 @@ export default function Dashboard() {
   if (!usuario) return null;
 
   return (
-    <div className="d-flex justify-content-center align-items-center min-vh-100">
-      <div className="card p-4 shadow" style={{ maxWidth: '600px', width: '100%' }}>
-        <div className="d-flex justify-content-between align-items-center mb-4">
-          <h2 className="m-0">Olá, {usuario.nome} 👋</h2>
-          <button className="btn btn-outline-danger" onClick={logout}>
-            Sair
-          </button>
-        </div>
-
-        <div className="mb-4">
-          <h5>Suas Campanhas como Mestre</h5>
-          <div className="alert alert-info d-flex justify-content-between align-items-center">
-            Nenhuma campanha criada ainda.
-            <button className="btn btn-sm btn-primary" onClick={criarCampanha}>
-              Criar Campanha
-            </button>
+    <Layout usuario={usuario}>
+      <div className="d-flex justify-content-center align-items-center min-vh-100">
+        <div className="card p-4 shadow" style={{ maxWidth: '600px', width: '100%' }}>
+          <div className="mb-4">
+            <h5>Suas Campanhas como Mestre</h5>
+            <div className="alert alert-info d-flex justify-content-between align-items-center">
+              Nenhuma campanha criada ainda.
+              <button className="btn btn-sm btn-primary" onClick={criarCampanha}>
+                Criar Campanha
+              </button>
+            </div>
           </div>
-        </div>
 
-        <div className="mb-4">
-          <h5>Campanhas que você participa</h5>
-          <div className="alert alert-secondary d-flex justify-content-between align-items-center">
-            Nenhuma campanha encontrada.
-            <button className="btn btn-sm btn-success">
-              Entrar com Código
-            </button>
+          <div className="mb-4">
+            <h5>Campanhas que você participa</h5>
+            <div className="alert alert-secondary d-flex justify-content-between align-items-center">
+              Nenhuma campanha encontrada.
+              <button className="btn btn-sm btn-success">
+                Entrar com Código
+              </button>
+            </div>
           </div>
         </div>
       </div>
-    </div>
+    </Layout>
   );
 }

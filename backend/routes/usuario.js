@@ -1,8 +1,10 @@
-const express = require('express');
+import express from 'express';
+import Usuario from '../models/usuario.js';
+import jwt from 'jsonwebtoken';
+import bcrypt from 'bcryptjs';
+import authMiddleware from '../middlewares/auth.js';
+
 const router = express.Router();
-const Usuario = require('../models/usuario');
-const jwt = require('jsonwebtoken');
-const bcrypt = require('bcryptjs');
 
 // POST /usuario/register
 router.post('/register', async (req, res) => {
@@ -48,8 +50,24 @@ router.post('/login', async (req, res) => {
       id: usuario._id,
       nome: usuario.nome,
       email: usuario.email,
+      imagemPerfil: usuario.imagemPerfil || null, // retorna a imagem, se houver
     },
   });
 });
 
-module.exports = router;
+// PUT /usuario/perfil/imagem
+router.put('/perfil/imagem', authMiddleware, async (req, res) => {
+  try {
+    const { imagemPerfil } = req.body; // espera base64 ou URL da imagem
+    if (!imagemPerfil) return res.status(400).send('Imagem não fornecida');
+
+    await Usuario.findByIdAndUpdate(req.usuarioId, { imagemPerfil });
+
+    res.status(200).send('Imagem atualizada com sucesso');
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('Erro ao atualizar imagem');
+  }
+});
+
+export default router;

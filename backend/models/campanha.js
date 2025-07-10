@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
 const campanhaSchema = new mongoose.Schema({
   nome: { type: String, required: true },
@@ -7,4 +7,6 @@ const campanhaSchema = new mongoose.Schema({
   jogadores: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Usuario' }],
 });
 
-module.exports = mongoose.model('Campanha', campanhaSchema);
+const Campanha = mongoose.model('Campanha', campanhaSchema);
+
+export default Campanha;
