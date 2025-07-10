@@ -1,15 +1,21 @@
 :root {
   --dd-red: #b94354;
   --dd-bg: #1a1a1a;
-  --dd-panel: #292929;
-  --dd-text: #f5f5f5;
-  --dd-accent: #ff4444;
+  --dd-panel: #202426;
+  --dd-text: #cecaac;
+  --dd-accent: #202426;
 }
 
 body {
   background: var(--dd-bg);
   color: var(--dd-text);
   font-family: 'Segoe UI', sans-serif;
+}
+
+/* Tema da Ficha */
+.ficha {
+  background-color: #0d0d0d;
+  color: #cecaac;
 }
 
 /* Painel de cada seção */
@@ -32,7 +38,7 @@ body {
 /* Bloco de atributo */
 .stat-block {
   background: #111;
-  border: 2px solid var(--dd-red);
+  border: 2px solid var(--dd-accent);
   border-radius: 8px;
   text-align: center;
   padding: 10px;
