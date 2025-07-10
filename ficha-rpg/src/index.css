@@ -47,3 +47,14 @@ h2 {
   text-align: center;
   margin-bottom: 1.5rem;
 }
+
+progress#pv-bar::-webkit-progress-value {
+  background-color: #b94354;
+  transition: width 0.3s ease;
+}
+progress#pv-bar {
+  appearance: none;
+  height: 16px;
+  border-radius: 6px;
+  background-color: #333;
+}

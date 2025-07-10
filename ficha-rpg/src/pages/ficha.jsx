@@ -1,132 +1,154 @@
-// ficha.jsx (versão com Bootstrap, sem CSS personalizado)
-import { useEffect } from 'react';
+// src/ficha.jsx
+import { useEffect, useRef, useState } from 'react';
+import './ficha.css'; // ou './ficha.css'
 
 export default function Ficha() {
-  useEffect(() => {
-    document.querySelectorAll('.nav-link').forEach((btn) => {
-      btn.addEventListener('click', (e) => {
-        e.preventDefault();
-        document.querySelector('.nav-link.active')?.classList.remove('active');
-        btn.classList.add('active');
+  const [pv, setPv] = useState(50);
+  const [pvMax, setPvMax] = useState(50);
+  const [pd, setPd] = useState(50);
+  const [pdMax, setPdMax] = useState(50);
+  const [avatarUrl, setAvatarUrl] = useState(null);
+  const pvBarRef = useRef();
+  const pdBarRef = useRef();
+  const animRef = useRef();
+  const [nome] = useState("Nome do Personagem");
+  const [classe] = useState("Paladino");
+  const [raca] = useState("Elfo");
+  const [nivel] = useState(6);
+  const [velocidade] = useState("30ft");
+  const [iniciativa] = useState("+2");
+  const [ca] = useState(16);
+  const [acoesTexto, setAcoesTexto] = useState('');
 
-        document.querySelector('.tab-pane.active')?.classList.remove('active', 'show');
-        document.querySelector(btn.getAttribute('href'))?.classList.add('active', 'show');
-      });
-    });
-  }, []);
+ useEffect(() => {
+  let current = pvBarRef.current?.value || 0;
+  const step = () => {
+    const diff = pv - current;
+    if (diff !== 0) {
+      current += Math.sign(diff) * Math.ceil(Math.abs(diff) / 5);
+      if ((diff > 0 && current > pv) || (diff < 0 && current < pv)) current = pv;
+      pvBarRef.current.value = current;
+      animRef.current = requestAnimationFrame(step);
+    }
+  };
+  cancelAnimationFrame(animRef.current);
+  step();
+  return () => cancelAnimationFrame(animRef.current);
+}, [pv, pvMax]);
+
+useEffect(() => {
+  let current = pdBarRef.current?.value || 0;
+  const step = () => {
+    const diff = pd - current;
+    if (diff !== 0) {
+      current += Math.sign(diff) * Math.ceil(Math.abs(diff) / 5);
+      if ((diff > 0 && current > pd) || (diff < 0 && current < pd)) current = pd;
+      pdBarRef.current.value = current;
+      animRef.current = requestAnimationFrame(step);
+    }
+  };
+  cancelAnimationFrame(animRef.current);
+  step();
+  return () => cancelAnimationFrame(animRef.current);
+}, [pd, pdMax]);
+
+  const habilidades = ["Atletismo", "Furtividade", "Religião", "Intuição", "Persuasão", "Percepção"];
+  const atributos = ["FOR", "DES", "CON", "INT", "SAB", "CAR"];
 
   return (
-    <div className="container py-4">
-      <ul className="nav nav-tabs justify-content-center mb-4">
-        <li className="nav-item">
-          <a className="nav-link active" href="#ficha">Ficha</a>
-        </li>
-        <li className="nav-item">
-          <a className="nav-link" href="#mochila">Mochila</a>
-        </li>
-        <li className="nav-item">
-          <a className="nav-link" href="#habilidades">Habilidades</a>
-        </li>
-      </ul>
-
-      <div className="tab-content">
-        <div className="tab-pane fade show active" id="ficha">
-          <div className="row">
-            <div className="col-md-4">
-              <div className="mb-3">
-                <label className="form-label">Nome</label>
-                <input type="text" className="form-control" id="nome" />
-              </div>
-              <h5 className="text-primary">Atributos</h5>
-              {['for', 'von', 'agi', 'int', 'pre', 'sor'].map((attr) => (
-                <div className="mb-2" key={attr}>
-                  <label className="form-label text-capitalize">{attr}</label>
-                  <input type="number" className="form-control" id={attr} min="0" max="10" />
-                </div>
-              ))}
-              <h5 className="text-primary mt-3">Perícias</h5>
-              {[
-                'Luta', 'Mentira', 'Intuição', 'Pontaria', 'Medicina',
-                'Atletismo', 'Pilotagem', 'Percepção', 'Furtividade',
-                'Intimidação', 'Investigação', 'Conhecimento',
-              ].map((skill, i) => (
-                <div className="mb-2" key={i}>
-                  <label className="form-label">{skill}</label>
-                  <input type="number" className="form-control" min="0" max="5" />
-                </div>
-              ))}
-            </div>
-
-            <div className="col-md-4">
-              <div className="mb-3 text-center border p-3" id="portrait" style={{ cursor: 'pointer', minHeight: '200px' }}>
-                Clique para carregar imagem
-              </div>
-              <div className="mb-3">
-                <label>Pontos de Vida</label>
-                <div className="input-group mb-1">
-                  <input type="number" className="form-control" id="pv" defaultValue="0" />
-                  <span className="input-group-text">/</span>
-                  <input type="number" className="form-control" id="pv-max" defaultValue="20" />
-                </div>
-                <progress id="pv-bar" value="0" max="20" className="w-100"></progress>
-              </div>
-              <div className="mb-3">
-                <label>Defesa</label>
-                <div className="input-group mb-1">
-                  <input type="number" className="form-control" id="def" defaultValue="0" />
-                  <span className="input-group-text">/</span>
-                  <input type="number" className="form-control" id="def-max" defaultValue="12" />
-                </div>
-                <progress id="def-bar" value="0" max="12" className="w-100"></progress>
-              </div>
-              <div className="mb-3">
-                <label>Nível</label>
-                <input type="number" className="form-control" id="nivel" defaultValue="1" min="1" />
-              </div>
-              <div className="mb-3">
-                <label>Experiência</label>
-                <div className="input-group mb-1">
-                  <input type="number" className="form-control" id="xp" defaultValue="0" />
-                  <span className="input-group-text">/</span>
-                  <input type="number" className="form-control" id="xp-max" defaultValue="100" />
-                </div>
-                <progress id="xp-bar" value="0" max="100" className="w-100"></progress>
-              </div>
-            </div>
-
-            <div className="col-md-4">
-              <div className="mb-3">
-                <label>Arma Principal</label>
-                <input type="text" className="form-control" id="arma1" />
-              </div>
-              <div className="mb-3">
-                <label>Escudo</label>
-                <input type="text" className="form-control" id="escudo" />
-              </div>
-              <div className="mb-3">
-                <label>Arma Secundária</label>
-                <input type="text" className="form-control" id="arma2" />
-              </div>
-              <div className="mb-3">
-                <label>Equipamento</label>
-                <input type="text" className="form-control" id="equip" />
-              </div>
-              <div className="mb-3">
-                <label>Artefato</label>
-                <div id="artefato" className="form-control" contentEditable={true} style={{ minHeight: '100px' }}></div>
-              </div>
+    <div className="container my-4 text-light">
+      {/* TOPO */}
+      <div className="card-dd">
+        <div className="row">
+          <div className="col-md-2 text-center">
+            <div className="avatar-circle" onClick={() => document.getElementById('avatarUpload').click()}>
+              {avatarUrl ? <img src={avatarUrl} alt="avatar" /> : 'Upload'}
+              <input
+                type="file"
+                id="avatarUpload"
+                style={{ display: 'none' }}
+                onChange={(e) => {
+                  const file = e.target.files[0];
+                  if (file) setAvatarUrl(URL.createObjectURL(file));
+                }}
+              />
             </div>
           </div>
+          <div className="col-md-10">
+            <h2>{nome}</h2>
+            <p className="mb-1">
+              Classe: <strong>{classe}</strong> | Raça: <strong>{raca}</strong> | Nível: <strong>{nivel}</strong>
+            </p>
+            <p className="mb-0">
+              Velocidade: <strong>{velocidade}</strong> | Iniciativa: <strong>{iniciativa}</strong> | CA: <strong>{ca}</strong>
+            </p>
+          </div>
         </div>
+      </div>
 
-        <div className="tab-pane fade" id="mochila">
-          <h4>Inventário</h4>
-          <textarea className="form-control" rows="10"></textarea>
+      {/* ATRIBUTOS */}
+      <div className="card-dd">
+        <h4>Atributos</h4>
+        <div className="attribute-grid">
+          {atributos.map((attr) => (
+            <div className="stat-block" key={attr}>
+              <h5>{attr}</h5>
+              <div className="score" contentEditable>+0</div>
+            </div>
+          ))}
         </div>
+      </div>
 
-        <div className="tab-pane fade" id="habilidades">
-          <h4>Habilidades &amp; Poderes</h4>
-          <textarea className="form-control" rows="10"></textarea>
+      {/* VIDA */}
+      <div className="card-dd">
+        <h4>Vida</h4>
+        <div className="input-group mb-2">
+          <span className="input-group-text">Atual</span>
+          <input type="number" className="form-control" value={pv} onChange={(e) => setPv(parseInt(e.target.value || 0))} />
+          <span className="input-group-text">/</span>
+          <input type="number" className="form-control" value={pvMax} onChange={(e) => setPvMax(parseInt(e.target.value || 0))} />
+        </div>
+        <progress ref={pvBarRef} value={pv} max={pvMax} className="w-100"></progress>
+      </div>
+
+      {/* DEFESA */}
+      <div className="card-dd">
+        <h4>Defesa</h4>
+        <div className="input-group mb-2">
+          <span className="input-group-text">Atual</span>
+          <input type="number" className="form-control" value={pd} onChange={(e) => setPd(parseInt(e.target.value || 0))} />
+          <span className="input-group-text">/</span>
+          <input type="number" className="form-control" value={pdMax} onChange={(e) => setPdMax(parseInt(e.target.value || 0))} />
+        </div>
+        <progress ref={pdBarRef} value={pd} max={pdMax} className="w-100 pd-bar"></progress>
+      </div>
+
+      {/* PERÍCIAS */}
+      <div className="card-dd">
+        <h4>Perícias</h4>
+        <div className="row">
+          {habilidades.map((skill, i) => (
+            <div className="col-md-4 mb-2" key={i}>
+              <label className="form-label">{skill}</label>
+              <input type="number" className="form-control" />
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* AÇÕES */}
+      <div className="card-dd">
+        <h4>Ações</h4>
+        <div className="editable-wrapper">
+          <div
+            className="editable"
+            contentEditable
+            onInput={(e) => setAcoesTexto(e.currentTarget.textContent)}
+            suppressContentEditableWarning={true}
+          ></div>
+          {acoesTexto.trim() === '' && (
+            <div className="placeholder">Adicione ataques, magias, bônus ou outras ações.</div>
+          )}
         </div>
       </div>
     </div>
