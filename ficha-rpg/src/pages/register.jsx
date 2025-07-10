@@ -5,6 +5,7 @@ export default function Register() {
   const [nome, setNome] = useState('');
   const [email, setEmail] = useState('');
   const [senha, setSenha] = useState('');
+  const [mostrarSenha, setMostrarSenha] = useState(false);
   const navigate = useNavigate();
 
   const handleRegister = async () => {
@@ -55,12 +56,21 @@ export default function Register() {
 
         <div className="mb-3">
           <label>Senha</label>
-          <input
-            type="password"
-            className="form-control"
-            value={senha}
-            onChange={(e) => setSenha(e.target.value)}
-          />
+          <div className="input-group">
+            <input
+              type={mostrarSenha ? 'text' : 'password'}
+              className="form-control"
+              value={senha}
+              onChange={(e) => setSenha(e.target.value)}
+            />
+            <button
+              type="button"
+              className="btn btn-outline-secondary"
+              onClick={() => setMostrarSenha(!mostrarSenha)}
+            >
+              <i className={`bi ${mostrarSenha ? 'bi-eye-slash' : 'bi-eye'}`}></i>
+            </button>
+          </div>
         </div>
 
         <button className="btn btn-primary w-100" onClick={handleRegister}>
