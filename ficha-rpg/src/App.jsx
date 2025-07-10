@@ -3,15 +3,23 @@ import Login from './pages/login';
 import Register from './pages/register';
 import Dashboard from './pages/dashboard';
 import Ficha from './pages/ficha';
+import PrivateRoute from './components/PrivateRoute';
 
 function App() {
   return (
     <BrowserRouter>
       <Routes>
+        {/* Públicas */}
         <Route path="/" element={<Login />} />
         <Route path="/register" element={<Register />} />
-        <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/ficha" element={<Ficha />} />
+
+        {/* Privadas */}
+        <Route path="/dashboard" element={
+          <PrivateRoute><Dashboard /></PrivateRoute>
+        } />
+        <Route path="/ficha" element={
+          <PrivateRoute><Ficha /></PrivateRoute>
+        } />
       </Routes>
     </BrowserRouter>
   );
