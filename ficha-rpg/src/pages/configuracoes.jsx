@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import Layout from '../components/layout';
+import Layout from '../components/Layout';
 
 export default function Configuracoes() {
   const [usuario, setUsuario] = useState(null);
@@ -13,16 +13,40 @@ export default function Configuracoes() {
     const input = document.createElement('input');
     input.type = 'file';
     input.accept = 'image/*';
-    input.onchange = (e) => {
+    input.onchange = async (e) => {
       const file = e.target.files[0];
       if (!file) return;
 
       const reader = new FileReader();
-      reader.onload = () => {
+      reader.onload = async () => {
         const base64 = reader.result;
-        const novoUsuario = { ...usuario, foto: base64 };
-        localStorage.setItem('usuario', JSON.stringify(novoUsuario));
-        setUsuario(novoUsuario);
+
+        try {
+          const token = localStorage.getItem('token');
+
+          const res = await fetch('http://localhost:3001/usuario/perfil/imagem', {
+            method: 'PUT',
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: token,
+            },
+            body: JSON.stringify({ imagemPerfil: base64 }),
+          });
+
+          if (!res.ok) {
+            const msg = await res.text();
+            alert(`Erro ao atualizar foto: ${msg}`);
+            return;
+          }
+
+          // Atualiza localStorage e state com a nova imagem
+          const novoUsuario = { ...usuario, imagemPerfil: base64 };
+          localStorage.setItem('usuario', JSON.stringify(novoUsuario));
+          setUsuario(novoUsuario);
+        } catch (err) {
+          console.error(err);
+          alert('Erro ao atualizar foto. Tente novamente.');
+        }
       };
       reader.readAsDataURL(file);
     };

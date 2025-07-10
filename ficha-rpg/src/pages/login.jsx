@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import useAuthRedirect from '../hooks/useAuthRedirect';
-import Header from '../components/header'; // ajuste o caminho conforme seu projeto
+import Header from '../components/Header'; // ajuste o caminho conforme seu projeto
 
 export default function Login() {
   useAuthRedirect(); // 🔒 redireciona se estiver logado
