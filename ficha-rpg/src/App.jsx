@@ -13,13 +13,11 @@ function App() {
         {/* Públicas */}
         <Route path="/" element={<Login />} />
         <Route path="/register" element={<Register />} />
+        <Route path="/ficha" element={<Ficha />} />
 
         {/* Privadas */}
         <Route path="/dashboard" element={
           <PrivateRoute><Dashboard /></PrivateRoute>
-        } />
-        <Route path="/ficha" element={
-          <PrivateRoute><Ficha /></PrivateRoute>
         } />
         <Route path="/configuracoes" element={
           <PrivateRoute><Configuracoes /></PrivateRoute>
