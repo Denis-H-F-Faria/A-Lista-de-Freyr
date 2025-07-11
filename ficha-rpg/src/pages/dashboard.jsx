@@ -180,7 +180,7 @@ export default function Dashboard() {
       </div>
 
       {/* Lado direito: botões em coluna */}
-      <div className="d-flex align-items-center gap-1 ms-auto">
+      <div className="d-flex align-items-center gap-1 justify-content-end">
         
         <button
           className="btn btn-sm btn-primary"

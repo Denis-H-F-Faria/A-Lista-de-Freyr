@@ -1,15 +1,17 @@
 import express from 'express';
 import jwt from 'jsonwebtoken';
+import Joi from 'joi';
 import Campanha from '../models/campanha.js';
 
 const router = express.Router();
 
+// Middleware de autenticação
 function autenticar(req, res, next) {
   const token = req.headers.authorization;
   if (!token) return res.status(401).send('Token ausente');
 
   try {
-    const decoded = jwt.verify(token, 'segredo123');
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
     req.usuarioId = decoded.id;
     next();
   } catch {
@@ -17,17 +19,28 @@ function autenticar(req, res, next) {
   }
 }
 
+// Função para gerar código de 6 caracteres
 function gerarCodigo() {
   return Math.random().toString(36).substring(2, 8).toUpperCase();
 }
 
-router.post('/', autenticar, async (req, res) => {
-  const { nome, sistema } = req.body;  // <-- corrigido aqui
-  const codigo = gerarCodigo();
+// Joi Schemas
+const schemaNovaCampanha = Joi.object({
+  nome: Joi.string().min(3).max(100).required(),
+  sistema: Joi.string().valid('D&D', 'Tormenta', 'Sistema Próprio').required(),
+});
 
-  if (!nome || !sistema) {
-    return res.status(400).send('Nome e sistema são obrigatórios');
-  }
+const schemaIdParam = Joi.object({
+  id: Joi.string().hex().length(24).required(),
+});
+
+// POST /campanhas - Criar campanha
+router.post('/', autenticar, async (req, res) => {
+  const { error } = schemaNovaCampanha.validate(req.body);
+  if (error) return res.status(400).send(error.details[0].message);
+
+  const { nome, sistema } = req.body;
+  const codigo = gerarCodigo();
 
   try {
     const campanha = new Campanha({
@@ -46,6 +59,7 @@ router.post('/', autenticar, async (req, res) => {
   }
 });
 
+// GET /campanhas - Listar campanhas do usuário
 router.get('/', autenticar, async (req, res) => {
   try {
     const usuarioId = req.usuarioId;
@@ -53,8 +67,8 @@ router.get('/', autenticar, async (req, res) => {
     const campanhas = await Campanha.find({
       $or: [
         { mestreId: usuarioId },
-        { jogadores: usuarioId }
-      ]
+        { jogadores: usuarioId },
+      ],
     }).lean();
 
     res.json(campanhas);
@@ -64,8 +78,11 @@ router.get('/', autenticar, async (req, res) => {
   }
 });
 
-// DELETE /campanhas/:id - deletar campanha pelo mestre
+// DELETE /campanhas/:id - Deletar campanha (apenas mestre)
 router.delete('/:id', autenticar, async (req, res) => {
+  const { error } = schemaIdParam.validate(req.params);
+  if (error) return res.status(400).send('ID inválido');
+
   try {
     const campanha = await Campanha.findById(req.params.id);
     if (!campanha) return res.status(404).send('Campanha não encontrada');

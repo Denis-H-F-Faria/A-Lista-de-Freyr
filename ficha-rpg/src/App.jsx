@@ -13,6 +13,7 @@ function App() {
         {/* Públicas */}
         <Route path="/" element={<Login />} />
         <Route path="/register" element={<Register />} />
+        
         <Route path="/ficha" element={<Ficha />} />
 
         {/* Privadas */}
