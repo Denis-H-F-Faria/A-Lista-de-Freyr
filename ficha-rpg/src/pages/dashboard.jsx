@@ -1,10 +1,11 @@
 import { useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { Trash, Pencil, BoxArrowInRight } from 'react-bootstrap-icons';
+import { toast } from 'react-toastify';
 import Layout from '../components/Layout';
 import ModalCriarCampanha from '../components/ModalCriarCampanha';
 import ModalEntrarCampanha from '../components/ModalEntrarCampanha';
-
+import ConfirmModal from '../components/ConfirmModal';
 
 const coresSistema = {
   'D&D': '#dc3545',
@@ -21,9 +22,10 @@ const logosSistema = {
 export default function Dashboard() {
   const [usuario, setUsuario] = useState(null);
   const [modalAberta, setModalAberta] = useState(false);
+  const [modalEntrarAberta, setModalEntrarAberta] = useState(false);
   const [campanhasMestre, setCampanhasMestre] = useState([]);
   const [campanhasJogador, setCampanhasJogador] = useState([]);
-  const [modalEntrarAberta, setModalEntrarAberta] = useState(false);
+  const [campanhaParaDeletar, setCampanhaParaDeletar] = useState(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -37,7 +39,6 @@ export default function Dashboard() {
 
   useEffect(() => {
     if (!usuario) return;
-
     const token = localStorage.getItem('token');
 
     const fetchCampanhas = async () => {
@@ -55,7 +56,7 @@ export default function Dashboard() {
         setCampanhasJogador(jogador);
       } catch (err) {
         console.error(err);
-        alert('Erro ao carregar campanhas');
+        toast.error('Erro ao carregar campanhas');
       }
     };
 
@@ -78,14 +79,14 @@ export default function Dashboard() {
 
       if (res.ok) {
         const novaCampanha = await res.json();
-        alert(`Campanha criada! Código: ${novaCampanha.codigo}`);
+        toast.success(`Campanha criada com sucesso! Código: ${novaCampanha.codigo}`);
         setCampanhasMestre(prev => [...prev, novaCampanha]);
       } else {
         const msg = await res.text();
-        alert('Erro ao criar campanha: ' + msg);
+        toast.error('Erro ao criar campanha: ' + msg);
       }
     } catch {
-      alert('Erro de conexão com o servidor.');
+      toast.error('Erro de conexão com o servidor.');
     }
   };
 
@@ -106,21 +107,24 @@ export default function Dashboard() {
       const data = await res.json();
 
       if (res.ok) {
-        alert(data.mensagem || 'Você entrou na campanha!');
+        toast.success(data.mensagem || 'Você entrou na campanha!');
         setCampanhasJogador(prev => [...prev, data.campanha]);
       } else {
-        alert(data || 'Erro ao entrar na campanha');
+        toast.error(data || 'Erro ao entrar na campanha');
       }
     } catch (err) {
       console.error(err);
-      alert('Erro ao conectar com o servidor');
+      toast.error('Erro ao conectar com o servidor');
     }
   };
 
-  const handleDeletar = async (campanha) => {
-    if (!window.confirm(`Tem certeza que deseja deletar a campanha "${campanha.nome}"?`)) return;
+  const handleDeletarClick = (campanha) => {
+    setCampanhaParaDeletar(campanha);
+  };
 
+  const confirmarDelecao = async () => {
     const token = localStorage.getItem('token');
+    const campanha = campanhaParaDeletar;
 
     try {
       const res = await fetch(`http://localhost:3001/campanhas/${campanha._id || campanha.id}`, {
@@ -129,27 +133,26 @@ export default function Dashboard() {
       });
 
       if (res.ok) {
-        alert('Campanha deletada com sucesso!');
-        // Atualizar listas removendo a campanha deletada
+        toast.success('Campanha deletada com sucesso!');
         setCampanhasMestre(prev => prev.filter(c => c._id !== campanha._id));
         setCampanhasJogador(prev => prev.filter(c => c._id !== campanha._id));
       } else {
         const msg = await res.text();
-        alert('Erro ao deletar campanha: ' + msg);
+        toast.error('Erro ao deletar campanha: ' + msg);
       }
     } catch (err) {
       console.error(err);
-      alert('Erro ao conectar com o servidor');
+      toast.error('Erro ao conectar com o servidor');
+    } finally {
+      setCampanhaParaDeletar(null);
     }
   };
 
   const handleEditar = (campanha) => {
-    // Aqui você pode abrir um modal para editar ou navegar para uma página de edição
-    alert(`Editar campanha "${campanha.nome}" - ainda não implementado.`);
+    toast.info(`Função de editar "${campanha.nome}" ainda não implementada.`);
   };
 
   const handleAcessar = (campanha) => {
-    // Navegar para a página da campanha (exemplo: /campanha/:codigo)
     navigate(`/campanha/${campanha.codigo}`);
   };
 
@@ -163,7 +166,6 @@ export default function Dashboard() {
         gap: '0px',
       }}
     >
-      {/* Lado esquerdo: logo + info */}
       <div className="d-flex align-items-center gap-3" style={{ flex: 1 }}>
         <img
           src={logosSistema[campanha.sistema] || '/logos/default.png'}
@@ -176,34 +178,15 @@ export default function Dashboard() {
           <small>Código: {campanha.codigo}</small>
         </div>
         <h6 className="d-flex gap-1 ms-auto">Jogadores 0/8</h6>
-        {/* Editar isso e conectar com o banco */}
       </div>
-
-      {/* Lado direito: botões em coluna */}
       <div className="d-flex align-items-center gap-1 justify-content-end">
-        
-        <button
-          className="btn btn-sm btn-primary"
-          onClick={() => handleAcessar(campanha)}
-          title="Acessar Campanha"
-          style={{ width: 36, height: 36, padding: 0 }}
-        >
+        <button className="btn btn-sm btn-primary" onClick={() => handleAcessar(campanha)} title="Acessar Campanha" style={{ width: 36, height: 36, padding: 0 }}>
           <BoxArrowInRight size={20} />
         </button>
-        <button
-          className="btn btn-sm btn-warning"
-          onClick={() => handleEditar(campanha)}
-          title="Editar Campanha"
-          style={{ width: 36, height: 36, padding: 0 }}
-        >
+        <button className="btn btn-sm btn-warning" onClick={() => handleEditar(campanha)} title="Editar Campanha" style={{ width: 36, height: 36, padding: 0 }}>
           <Pencil size={20} />
         </button>
-        <button
-          className="btn btn-sm btn-danger"
-          onClick={() => handleDeletar(campanha)}
-          title="Deletar Campanha"
-          style={{ width: 36, height: 36, padding: 0 }}
-        >
+        <button className="btn btn-sm btn-danger" onClick={() => handleDeletarClick(campanha)} title="Deletar Campanha" style={{ width: 36, height: 36, padding: 0 }}>
           <Trash size={20} />
         </button>
       </div>
@@ -251,16 +234,15 @@ export default function Dashboard() {
           </div>
         </div>
 
-        <ModalCriarCampanha
-          aberto={modalAberta}
-          onFechar={() => setModalAberta(false)}
-          onCriar={criarCampanha}
-        />
+        <ModalCriarCampanha aberto={modalAberta} onFechar={() => setModalAberta(false)} onCriar={criarCampanha} />
+        <ModalEntrarCampanha aberto={modalEntrarAberta} onFechar={() => setModalEntrarAberta(false)} onEntrar={entrarCampanha} />
 
-        <ModalEntrarCampanha
-          aberto={modalEntrarAberta}
-          onFechar={() => setModalEntrarAberta(false)}
-          onEntrar={entrarCampanha}
+        <ConfirmModal
+          show={!!campanhaParaDeletar}
+          onHide={() => setCampanhaParaDeletar(null)}
+          onConfirm={confirmarDelecao}
+          titulo="Deletar Campanha"
+          mensagem={`Tem certeza que deseja deletar a campanha "${campanhaParaDeletar?.nome}"?`}
         />
       </div>
     </Layout>
