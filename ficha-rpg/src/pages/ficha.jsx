@@ -78,6 +78,7 @@ useEffect(() => {
   return (
     <div className="ficha ">
       <div className="container my-4">
+        
         {/* TOPO */}
         <div className="card-dd">
           <div className="row">
@@ -126,8 +127,12 @@ useEffect(() => {
             <div class="row">
               <h4 class="col">Vida</h4>
               <div class="col col-lg-1 text-end">{pv}/{pvMax}</div>
-              <input type="number" className="col col-lg-1 bg-dark text-light border-secondary input-group-text" value={pv} onChange={(e) => setPv(parseInt(e.target.value || 0))} />
-              <input type="number" className="col col-lg-1 bg-dark text-light border-secondary input-group-text" value={pvMax} onChange={(e) => setPvMax(parseInt(e.target.value || 0))} />           
+              <div class="col col-lg-1">
+                <button className="btn btn-outline-secondary" onClick={() => setPv((prev) => Math.max(0, prev - 1))}>-</button>
+              </div>
+              <div class="col col-lg-1">
+                <button className="btn btn-outline-secondary" onClick={() => setPv((prev) => Math.min(pvMax, prev + 1))}>+</button>
+              </div>
             </div>
           </div>
           <progress ref={pvBarRef} value={pv} max={pvMax} className="w-100"></progress>
@@ -137,7 +142,7 @@ useEffect(() => {
         <div className="card-dd">
           <div class="container">
             <div class="row">
-              <h4 class="col">Vida</h4>
+              <h4 class="col">Defesa</h4>
               <div class="col col-lg-1 text-end">{pd}/{pdMax}</div>
               <input type="number" className="col col-lg-1 bg-dark text-light border-secondary input-group-text" value={pd} onChange={(e) => setPd(parseInt(e.target.value || 0))} />
               <input type="number" className="col col-lg-1 bg-dark text-light border-secondary input-group-text" value={pdMax} onChange={(e) => setPdMax(parseInt(e.target.value || 0))} />           
