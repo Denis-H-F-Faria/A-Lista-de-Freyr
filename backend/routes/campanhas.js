@@ -5,6 +5,47 @@ import Campanha from '../models/campanha.js';
 
 const router = express.Router();
 
+// POST /campanhas/entrar - Entrar em uma campanha pelo código
+router.post('/entrar', autenticar, async (req, res) => {
+  const { codigo } = req.body;
+
+  // Validação básica
+  if (!codigo || typeof codigo !== 'string') {
+    return res.status(400).json({ mensagem: 'Código da campanha é obrigatório' });
+  }
+
+  try {
+    const campanha = await Campanha.findOne({ codigo: codigo.toUpperCase() });
+
+    // Verifica se a campanha existe
+    if (!campanha) {
+      return res.status(404).json({ mensagem: 'Campanha não encontrada' });
+    }
+
+    // Verifica se o usuário já está na campanha
+    if (campanha.jogadores.includes(req.usuarioId)) {
+      return res.status(400).json({ mensagem: 'Você já está na campanha' });
+    }
+
+    // Verifica o limite de jogadores
+    if (campanha.jogadores.length >= 8) {
+      return res.status(400).json({ mensagem: 'A campanha atingiu o limite de jogadores (8)' });
+    }
+
+    // Adiciona o usuário à campanha
+    campanha.jogadores.push(req.usuarioId);
+    await campanha.save();
+
+    return res.status(200).json({
+      mensagem: 'Você entrou na campanha com sucesso!',
+      campanha,
+    });
+  } catch (err) {
+    console.error('[ERRO] Falha ao entrar na campanha:', err);
+    res.status(500).json({ mensagem: 'Erro ao entrar na campanha. Tente novamente mais tarde.' });
+  }
+});
+
 // Middleware de autenticação
 function autenticar(req, res, next) {
   const token = req.headers.authorization;

@@ -1,11 +1,12 @@
 import { useState } from 'react';
+import { toast } from 'react-toastify';
 
 export default function ModalEntrarCampanha({ aberto, onFechar, onEntrar }) {
   const [codigo, setCodigo] = useState('');
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (!codigo.trim()) return alert('Digite um código válido');
+    if (!codigo.trim()) return toast.error('Digite um código válido');
     onEntrar(codigo.trim().toUpperCase());
     setCodigo('');
   };

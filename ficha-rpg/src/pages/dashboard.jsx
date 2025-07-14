@@ -72,7 +72,7 @@ export default function Dashboard() {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': token,
+          Authorization: token,
         },
         body: JSON.stringify({ nome, sistema }),
       });
@@ -110,7 +110,7 @@ export default function Dashboard() {
         toast.success(data.mensagem || 'Você entrou na campanha!');
         setCampanhasJogador(prev => [...prev, data.campanha]);
       } else {
-        toast.error(data || 'Erro ao entrar na campanha');
+        toast.warn(data.mensagem || 'Erro ao entrar na campanha');
       }
     } catch (err) {
       console.error(err);
@@ -177,7 +177,9 @@ export default function Dashboard() {
           <small className="text-muted">{campanha.sistema}</small><br />
           <small>Código: {campanha.codigo}</small>
         </div>
-        <h6 className="d-flex gap-1 ms-auto">Jogadores 0/8</h6>
+        <h6 className="d-flex gap-1 ms-auto">
+          Jogadores {Array.isArray(campanha.jogadores) ? campanha.jogadores.length : 0}/8
+        </h6>
       </div>
       <div className="d-flex align-items-center gap-1 justify-content-end">
         <button className="btn btn-sm btn-primary" onClick={() => handleAcessar(campanha)} title="Acessar Campanha" style={{ width: 36, height: 36, padding: 0 }}>
@@ -209,27 +211,39 @@ export default function Dashboard() {
         <div className="row">
           <div className="col-md-5">
             <h5>Suas Campanhas como Mestre</h5>
-            {campanhasMestre.length === 0 && (
-              <div className="alert alert-info d-flex justify-content-between align-items-center">
-                Nenhuma campanha criada ainda.
-                <button className="btn btn-sm btn-primary" onClick={() => setModalAberta(true)}>
-                  Criar Campanha
-                </button>
-              </div>
-            )}
+            <div
+              className="card row mb-2 p-3 d-flex align-items-center justify-content-center text-muted"
+              style={{
+                backgroundColor: '#e0e0e0ff',
+                cursor: 'pointer',
+                height: '100px',
+                minHeight: 100,
+              }}
+              onClick={() => setModalAberta(true)}
+            >
+              <h2 className="m-0">
+                <span className="text-secondary">+</span>
+              </h2>
+            </div>
             {campanhasMestre.map(renderCampanhaBox)}
           </div>
 
           <div className="col-md-5">
-            <h5>Campanhas que você participa</h5>
-            {campanhasJogador.length === 0 && (
-              <div className="alert alert-secondary d-flex justify-content-between align-items-center">
-                Nenhuma campanha encontrada.
-                <button className="btn btn-sm btn-success" onClick={() => setModalEntrarAberta(true)}>
-                  Entrar com Código
-                </button>
-              </div>
-            )}
+            <h5>Suas Campanhas como Jogador</h5>
+            <div
+              className="card row mb-2 p-4 d-flex align-items-center justify-content-center text-muted"
+              style={{
+                backgroundColor: '#f1f1f1',
+                border: '2px dashed #aaa',
+                cursor: 'pointer',
+                minHeight: 100,
+              }}
+              onClick={() => setModalEntrarAberta(true)}
+            >
+              <h2 style={{ margin: 0, fontSize: '2rem' }}>
+                <span className="text-secondary">+</span>
+              </h2>
+            </div>
             {campanhasJogador.map(renderCampanhaBox)}
           </div>
         </div>
