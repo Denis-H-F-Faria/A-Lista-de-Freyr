@@ -1,56 +1,68 @@
 import { useEffect, useState } from 'react';
 import Layout from '../components/Layout';
+import ModalAlterarFoto from '../components/ModalAlterarFoto';
 
 export default function Configuracoes() {
   const [usuario, setUsuario] = useState(null);
+  const [mostrarModalFoto, setMostrarModalFoto] = useState(false);
 
   useEffect(() => {
     const saved = localStorage.getItem('usuario');
     if (saved) setUsuario(JSON.parse(saved));
   }, []);
 
-  const atualizarFoto = () => {
-    const input = document.createElement('input');
-    input.type = 'file';
-    input.accept = 'image/*';
-    input.onchange = async (e) => {
-      const file = e.target.files[0];
-      if (!file) return;
+  const salvarNovaImagem = async (base64) => {
+    try {
+      const token = localStorage.getItem('token');
+      const res = await fetch('http://localhost:3001/usuario/perfil/imagem', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: token,
+        },
+        body: JSON.stringify({ imagemPerfil: base64 }),
+      });
 
-      const reader = new FileReader();
-      reader.onload = async () => {
-        const base64 = reader.result;
+      if (res.ok) {
+        const novoUsuario = { ...usuario, imagemPerfil: base64 };
+        localStorage.setItem('usuario', JSON.stringify(novoUsuario));
+        setUsuario(novoUsuario);
+        setMostrarModalFoto(false);
+      } else {
+        const msg = await res.text();
+        alert('Erro ao salvar imagem: ' + msg);
+      }
+    } catch (err) {
+      console.error(err);
+      alert('Erro ao salvar imagem');
+    }
+  };
 
-        try {
-          const token = localStorage.getItem('token');
+  const removerImagem = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const res = await fetch('http://localhost:3001/usuario/perfil/imagem', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: token,
+        },
+        body: JSON.stringify({ imagemPerfil: null }), // ⬅️ ENVIA NULL, não string vazia
+      });
 
-          const res = await fetch('http://localhost:3001/usuario/perfil/imagem', {
-            method: 'PUT',
-            headers: {
-              'Content-Type': 'application/json',
-              Authorization: token,
-            },
-            body: JSON.stringify({ imagemPerfil: base64 }),
-          });
-
-          if (!res.ok) {
-            const msg = await res.text();
-            alert(`Erro ao atualizar foto: ${msg}`);
-            return;
-          }
-
-          // Atualiza localStorage e state com a nova imagem
-          const novoUsuario = { ...usuario, imagemPerfil: base64 };
-          localStorage.setItem('usuario', JSON.stringify(novoUsuario));
-          setUsuario(novoUsuario);
-        } catch (err) {
-          console.error(err);
-          alert('Erro ao atualizar foto. Tente novamente.');
-        }
-      };
-      reader.readAsDataURL(file);
-    };
-    input.click();
+      if (res.ok) {
+        const novoUsuario = { ...usuario, imagemPerfil: null };
+        localStorage.setItem('usuario', JSON.stringify(novoUsuario));
+        setUsuario(novoUsuario);
+        setMostrarModalFoto(false);
+      } else {
+        const msg = await res.text();
+        alert('Erro ao remover imagem: ' + msg);
+      }
+    } catch (err) {
+      console.error(err);
+      alert('Erro ao remover imagem');
+    }
   };
 
   if (!usuario) return null;
@@ -63,27 +75,34 @@ export default function Configuracoes() {
         <div className="mb-4">
           <label className="form-label">Foto de Perfil</label>
           <div className="d-flex align-items-center gap-3">
-            {usuario.foto ? (
+            {usuario.imagemPerfil ? (
               <img
-                src={usuario.foto}
+                src={usuario.imagemPerfil}
                 alt="Foto"
                 className="rounded-circle border"
                 style={{ width: 80, height: 80, objectFit: 'cover' }}
               />
             ) : (
               <div
-                className="rounded-circle bg-secondary d-flex justify-content-center align-items-center"
+                className="rounded-circle bg-secondary d-flex justify-content-center align-items-center text-white"
                 style={{ width: 80, height: 80 }}
               >
-                <span className="text-white">{usuario.nome[0]}</span>
+                <span>{usuario.nome[0]}</span>
               </div>
             )}
-            <button className="btn btn-outline-primary" onClick={atualizarFoto}>
+            <button className="btn btn-outline-primary" onClick={() => setMostrarModalFoto(true)}>
               Alterar Foto
             </button>
           </div>
         </div>
-        {/* Você pode adicionar outras configurações aqui */}
+
+        <ModalAlterarFoto
+          show={mostrarModalFoto}
+          onClose={() => setMostrarModalFoto(false)}
+          onSalvar={salvarNovaImagem}
+          onRemover={removerImagem}
+          imagemAtual={usuario.imagemPerfil}
+        />
       </div>
     </Layout>
   );

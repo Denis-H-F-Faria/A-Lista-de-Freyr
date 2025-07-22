@@ -72,7 +72,16 @@ router.post('/login', async (req, res) => {
 router.put('/perfil/imagem', authMiddleware, async (req, res) => {
   try {
     const { imagemPerfil } = req.body;
-    if (!imagemPerfil) return res.status(400).send('Imagem não fornecida');
+
+    // Permitir remover imagem
+    if (imagemPerfil === null) {
+      await Usuario.findByIdAndUpdate(req.usuarioId, { imagemPerfil: null });
+      return res.status(200).send('Imagem removida com sucesso');
+    }
+
+    if (!imagemPerfil || typeof imagemPerfil !== 'string' || !imagemPerfil.startsWith('data:image')) {
+      return res.status(400).send('Imagem inválida ou não fornecida');
+    }
 
     await Usuario.findByIdAndUpdate(req.usuarioId, { imagemPerfil });
 
